@@ -97,6 +97,18 @@
             box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
             border-left: 4px solid var(--mottu-green);
         }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details summary .arrow {
+            transition: transform 0.2s;
+        }
+        details[open] summary .arrow {
+            transform: rotate(90deg);
+        }
     </style>
 </head>
 <body class="text-slate-800">
@@ -220,7 +232,7 @@
                          <h2 class="text-3xl font-bold text-black">Additional Topics for Discussion</h2>
                          <p class="mt-2 text-slate-600 max-w-3xl mx-auto">The following topics are also on our agenda. We will provide detailed documentation for these points in our next weekly meeting.</p>
                     </div>
-                    <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
                         <div class="kpi-card">
                             <h3 class="text-xl font-semibold mb-3 text-black">Wrong Purchase by Wrong Item Code</h3>
                             <p class="text-slate-600">We need to discuss recurring issues of incorrect parts being ordered due to item code mismatches. To prevent this, we will start attaching the reference parts catalog to every order placed in the system. If an incorrect order is placed due to a catalog error, we will request a reimbursement.</p>
@@ -237,48 +249,41 @@
                             <h3 class="text-xl font-semibold mb-3 text-black">Purchase and Freight Integration</h3>
                             <p class="text-slate-600">Exploring options for better integration between the purchase order system and freight management to optimize logistics and costs.</p>
                         </div>
-                        <div class="kpi-card md:col-span-2">
-                            <h3 class="text-xl font-semibold mb-3 text-black">S&OP Forecast (May - Dec 2025)</h3>
-                            <p class="text-slate-600">Detailed S&OP data is available for discussion if needed. Supporting documentation will follow.</p>
-                            <button id="toggle-sop-btn" class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700">View/Hide S&OP Details</button>
-                        </div>
+                        <details class="bg-white rounded-lg shadow-md">
+                            <summary class="kpi-card cursor-pointer flex justify-between items-center">
+                                <div>
+                                    <h3 class="text-xl font-semibold text-black">Data</h3>
+                                    <p class="text-slate-600 mt-1">Detailed forecast data available for discussion if needed.</p>
+                                </div>
+                                <span class="arrow text-2xl text-slate-500 transform transition-transform duration-200">&#9654;</span>
+                            </summary>
+                            <div id="section-sop" class="p-6 border-t">
+                                <div id="model-filter-selector" class="flex flex-wrap justify-center gap-2 mb-4">
+                                     <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="All">All Models</button>
+                                     <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="KS">Mottu Sport KS</button>
+                                     <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="ESD">Mottu Sport ESD</button>
+                                </div>
+                                <div id="sku-selector" class="flex flex-wrap justify-center gap-2 p-2 bg-slate-100 rounded-lg">
+                                </div>
+                                <div class="bg-white p-4 sm:p-6 rounded-lg mt-4">
+                                    <h3 id="sop-title" class="text-2xl font-bold text-center mb-4 text-black"></h3>
+                                    <div class="chart-container mb-6">
+                                        <canvas id="sopChart"></canvas>
+                                    </div>
+                                    <div class="overflow-x-auto">
+                                        <table class="min-w-full border-collapse">
+                                            <thead id="sop-table-head"></thead>
+                                            <tbody id="sop-table-body"></tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                 <div class="text-center mt-4">
+                                    <p class="text-sm text-slate-500 italic"><strong>Disclaimer:</strong> The data presented is part of a planning exercise. The values are estimates based on our current forecast and should not be considered a firm commitment or an absolute purchase guarantee. They are intended for discussion and planning purposes only.</p>
+                                </div>
+                            </div>
+                        </details>
                     </div>
                 </section>
-
-                <!-- S&OP Section -->
-                <section id="section-sop" class="hidden space-y-6 mt-8">
-                    <div class="text-center">
-                         <h2 class="text-3xl font-bold text-black">Top SKUs - S&OP Forecast (May - Dec 2025)</h2>
-                         <p class="mt-2 text-slate-600 max-w-4xl mx-auto">This section provides a detailed supply and demand forecast for our key SKUs. Please select a product to view its specific plan.</p>
-                    </div>
-
-                    <div id="model-filter-selector" class="flex flex-wrap justify-center gap-2 mb-4">
-                         <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="All">All Models</button>
-                         <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="KS">Mottu Sport KS</button>
-                         <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="ESD">Mottu Sport ESD</button>
-                    </div>
-                    
-                    <div id="sku-selector" class="flex flex-wrap justify-center gap-2 p-2 bg-slate-100 rounded-lg">
-                        <!-- SKU buttons will be injected here -->
-                    </div>
-
-                    <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg mt-4">
-                        <h3 id="sop-title" class="text-2xl font-bold text-center mb-4 text-black"></h3>
-                        <div class="chart-container mb-6">
-                            <canvas id="sopChart"></canvas>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="min-w-full border-collapse">
-                                <thead id="sop-table-head"></thead>
-                                <tbody id="sop-table-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                     <div class="text-center mt-4">
-                        <p class="text-sm text-slate-500 italic"><strong>Disclaimer:</strong> The data presented is part of a planning exercise. The values are estimates based on our current forecast and should not be considered a firm commitment or an absolute purchase guarantee. They are intended for discussion and planning purposes only.</p>
-                    </div>
-                </section>
-
             </main>
         </div>
     </div>
@@ -520,11 +525,10 @@
                     setContainerView('chart');
                 }
                 
-                const toggleSopBtn = document.getElementById('toggle-sop-btn');
+                const sopDetails = document.querySelector('details');
                 const sopSection = document.getElementById('section-sop');
-                toggleSopBtn.addEventListener('click', () => {
-                    sopSection.classList.toggle('hidden');
-                     if (!sopSection.classList.contains('hidden')) {
+                sopDetails.addEventListener('toggle', () => {
+                    if (sopDetails.open) {
                         sopSection.scrollIntoView({ behavior: 'smooth' });
                     }
                 });
