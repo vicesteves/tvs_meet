@@ -129,7 +129,6 @@
             <nav class="flex flex-wrap justify-center gap-2 mb-8">
                 <button id="nav-logistics" class="nav-button px-4 py-2 rounded-lg font-semibold bg-white shadow-sm hover:bg-green-100">Logistics & Operations</button>
                 <button id="nav-commercial" class="nav-button px-4 py-2 rounded-lg font-semibold bg-white shadow-sm hover:bg-green-100">Commercial & Claims</button>
-                <button id="nav-sop" class="nav-button px-4 py-2 rounded-lg font-semibold bg-white shadow-sm hover:bg-green-100">S&OP Forecast</button>
                 <button id="nav-additional" class="nav-button px-4 py-2 rounded-lg font-semibold bg-white shadow-sm hover:bg-green-100">Additional Topics</button>
             </nav>
 
@@ -152,8 +151,7 @@
                                 </div>
                                 <div class="border-t pt-4">
                                     <h4 class="font-semibold text-slate-700">B. Packaging Damage on Arrival</h4>
-                                    <p class="text-slate-600 mt-1 text-sm">Understand the options available to improve the loading process to prevent damage on the
-packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
+                                    <p class="text-slate-600 mt-1 text-sm">The current loading process may be causing damage to packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
                                     <button class="mt-2 px-3 py-1 bg-slate-200 text-slate-800 text-sm font-semibold rounded-md hover:bg-slate-300" onclick="showImageModal('B')">View Images</button>
                                 </div>
                             </div>
@@ -216,8 +214,39 @@ packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
                     </div>
                 </section>
 
+                <!-- Additional Topics Section -->
+                <section id="section-additional" class="hidden space-y-8">
+                    <div class="text-center">
+                         <h2 class="text-3xl font-bold text-black">Additional Topics for Discussion</h2>
+                         <p class="mt-2 text-slate-600 max-w-3xl mx-auto">The following topics are also on our agenda. We will provide detailed documentation for these points in our next weekly meeting.</p>
+                    </div>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-semibold mb-3 text-black">Wrong Purchase by Wrong Item Code</h3>
+                            <p class="text-slate-600">We need to discuss recurring issues of incorrect parts being ordered due to item code mismatches. To prevent this, we will start attaching the reference parts catalog to every order placed in the system. If an incorrect order is placed due to a catalog error, we will request a reimbursement.</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-semibold mb-3 text-black">Order Fulfillment & Credit Policy</h3>
+                            <p class="text-slate-600">Discussion on order fulfillment rates and establishing a clear credit policy for failures or discrepancies in shipments.</p>
+                        </div>
+                         <div class="kpi-card">
+                            <h3 class="text-xl font-semibold mb-3 text-black">Purchase History and Centralized Access</h3>
+                            <p class="text-slate-600">Proposal to develop a centralized platform for accessing complete purchase histories to improve tracking and analysis.</p>
+                        </div>
+                        <div class="kpi-card">
+                            <h3 class="text-xl font-semibold mb-3 text-black">Purchase and Freight Integration</h3>
+                            <p class="text-slate-600">Exploring options for better integration between the purchase order system and freight management to optimize logistics and costs.</p>
+                        </div>
+                        <div class="kpi-card md:col-span-2">
+                            <h3 class="text-xl font-semibold mb-3 text-black">S&OP Forecast (May - Dec 2025)</h3>
+                            <p class="text-slate-600">Detailed S&OP data is available for discussion if needed. Supporting documentation will follow.</p>
+                            <button id="toggle-sop-btn" class="mt-4 px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700">View/Hide S&OP Details</button>
+                        </div>
+                    </div>
+                </section>
+
                 <!-- S&OP Section -->
-                <section id="section-sop" class="hidden space-y-6">
+                <section id="section-sop" class="hidden space-y-6 mt-8">
                     <div class="text-center">
                          <h2 class="text-3xl font-bold text-black">Top SKUs - S&OP Forecast (May - Dec 2025)</h2>
                          <p class="mt-2 text-slate-600 max-w-4xl mx-auto">This section provides a detailed supply and demand forecast for our key SKUs. Please select a product to view its specific plan.</p>
@@ -247,32 +276,6 @@ packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
                     </div>
                      <div class="text-center mt-4">
                         <p class="text-sm text-slate-500 italic"><strong>Disclaimer:</strong> The data presented is part of a planning exercise. The values are estimates based on our current forecast and should not be considered a firm commitment or an absolute purchase guarantee. They are intended for discussion and planning purposes only.</p>
-                    </div>
-                </section>
-
-                <!-- Additional Topics Section -->
-                <section id="section-additional" class="hidden space-y-8">
-                    <div class="text-center">
-                         <h2 class="text-3xl font-bold text-black">Additional Topics for Discussion</h2>
-                         <p class="mt-2 text-slate-600 max-w-3xl mx-auto">The following topics are also on our agenda. We will provide detailed documentation for these points in our next weekly meeting.</p>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-8">
-                        <div class="kpi-card">
-                            <h3 class="text-xl font-semibold mb-3 text-black">Wrong Purchase by Wrong Item Code</h3>
-                            <p class="text-slate-600">We need to discuss recurring issues of incorrect parts being ordered due to item code mismatches and explore potential automatic validation systems.</p>
-                        </div>
-                        <div class="kpi-card">
-                            <h3 class="text-xl font-semibold mb-3 text-black">Order Fulfillment & Credit Policy</h3>
-                            <p class="text-slate-600">Discussion on order fulfillment rates and establishing a clear credit policy for failures or discrepancies in shipments.</p>
-                        </div>
-                         <div class="kpi-card">
-                            <h3 class="text-xl font-semibold mb-3 text-black">Purchase History and Centralized Access</h3>
-                            <p class="text-slate-600">Proposal to develop a centralized platform for accessing complete purchase histories to improve tracking and analysis.</p>
-                        </div>
-                        <div class="kpi-card">
-                            <h3 class="text-xl font-semibold mb-3 text-black">Purchase and Freight Integration</h3>
-                            <p class="text-slate-600">Exploring options for better integration between the purchase order system and freight management to optimize logistics and costs.</p>
-                        </div>
                     </div>
                 </section>
 
@@ -331,7 +334,7 @@ packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
                 'N3200090': { model: 'KS', name: 'ROLAMENTO ESFERA CILIND 20X42X12', metrics: { 'Purchase Qty': [8004, 0, 4645, 5187, 4913, 0, 4539, 4269], 'Purchase cost - BRL': ['150,955', '0', '87,598', '97,834', '92,665', '0', '85,608', '80,505'], 'Warehouse inventory EoP - BRL': ['246,953', '194,484', '124,212', '203,763', '112,599', '125,342', '146,698', '168,922'], 'Stock Consumption - BRL': ['217,644', '60,126', '70,272', '71,404', '91,165', '74,855', '76,477', '70,442'], 'Total Inventory EoP - BRL': ['397,908', '337,783', '355,108', '381,538', '383,039', '308,184', '317,314', '327,377'], 'Days of Inventory - Warehouse EoP': [-255, 87, 48, 77, 42, 51, 60, 72], 'Days of Inventory - Total EoP': [-410, 151, 137, 145, 142, 125, 130, 139], }},
                 'KA060100': { model: 'KS', name: 'BICO INJETOR - POP / Sport', metrics: { 'Purchase Qty': [0, 0, 0, 1966, 2137, 0, 1957, 1853], 'Purchase cost - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 140.198', 'R$ 152.363', 'R$ 0', 'R$ 139.569', 'R$ 132.142'], 'Warehouse inventory EoP - BRL': ['R$ 577.611', 'R$ 506.800', 'R$ 542.883', 'R$ 439.769', 'R$ 303.745', 'R$ 189.007', 'R$ 209.333', 'R$ 249.576'], 'Stock Consumption - BRL': ['R$ 122.011', 'R$ 77.015', 'R$ 96.839', 'R$ 103.114', 'R$ 136.024', 'R$ 114.738', 'R$ 119.872', 'R$ 112.121'], 'Total Inventory EoP - BRL': ['R$ 716.737', 'R$ 639.722', 'R$ 542.883', 'R$ 579.967', 'R$ 596.306', 'R$ 481.569', 'R$ 501.266', 'R$ 521.287'], 'Days of Inventory - Warehouse EoP': [176, 165, 145, 112, 74, 49, 54, 67], 'Days of Inventory - Total EoP': [218, 208, 145, 148, 145, 125, 130, 139], }},
                 'NA020140': { model: 'KS', name: 'VIRABREQUIM DO MOTOR', metrics: { 'Purchase Qty': [0, 0, 0, 713, 808, 0, 748, 704], 'Purchase cost - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 127.831', 'R$ 144.864', 'R$ 0', 'R$ 134.044', 'R$ 126.152'], 'Warehouse inventory EoP - BRL': ['R$ 195.448', 'R$ 186.393', 'R$ 579.620', 'R$ 468.447', 'R$ 326.568', 'R$ 209.658', 'R$ 217.890', 'R$ 252.370'], 'Stock Consumption - BRL': ['R$ 130.896', 'R$ 96.917', 'R$ 108.841', 'R$ 111.172', 'R$ 141.879', 'R$ 116.910', 'R$ 119.600', 'R$ 110.383'], 'Total Inventory EoP - BRL': ['R$ 785.378', 'R$ 688.461', 'R$ 579.620', 'R$ 596.279', 'R$ 599.264', 'R$ 482.354', 'R$ 496.798', 'R$ 512.567'], 'Days of Inventory - Warehouse EoP': [52, 53, 144, 114, 78, 54, 57, 69], 'Days of Inventory - Total EoP': [210, 196, 144, 145, 143, 125, 130, 139], }},
-                'ND161010': { model: 'ESD', name: 'CHICOTE PRINCIPAL COMPLETO - ESD', metrics: { 'Purchase Qty': [8004, 0, 4645, 5187, 4913, 0, 4539, 4269], 'Purchase cost - BRL': ['150,955', '0', '87,598', '97,834', '92,665', '0', '85,608', '80,505'], 'Warehouse inventory EoP - BRL': ['246,953', '194,484', '124,212', '203,763', '112,599', '125,342', '146,698', '168,922'], 'Stock Consumption - BRL': ['217,644', '60,126', '70,272', '71,404', '91,165', '74,855', '76,477', '70,442'], 'Total Inventory EoP - BRL': ['397,908', '337,783', '355,108', '381,538', '383,039', '308,184', '317,314', '327,377'], 'Days of Inventory - Warehouse EoP': [-255, 87, 48, 77, 42, 51, 60, 72], 'Days of Inventory - Total EoP': [-410, 151, 137, 145, 142, 125, 130, 139], }},
+                'ND161010': { model: 'ESD', name: 'CHICOTE PRINCIPAL COMPLETO - ESD', metrics: { 'Purchase Qty': [0, 300, 254, 154, 574, 315, 346, 410], 'Purchase cost - BRL': ['R$ 0', 'R$ 71.262', 'R$ 60.244', 'R$ 36.512', 'R$ 136.328', 'R$ 74.774', 'R$ 82.306', 'R$ 97.391'], 'Warehouse inventory EoP - BRL': ['R$ 0', 'R$ 4.157', 'R$ 0', 'R$ 0', 'R$ 47.746', 'R$ 66.420', 'R$ 46.635', 'R$ 105.050'], 'Stock Consumption - BRL': ['R$ 3.801', 'R$ 5.345', 'R$ 1.782', 'R$ 0', 'R$ 23.516', 'R$ 41.570', 'R$ 56.297', 'R$ 77.913'], 'Total Inventory EoP - BRL': ['R$ 9.502', 'R$ 75.419', 'R$ 133.881', 'R$ 170.393', 'R$ 283.205', 'R$ 316.410', 'R$ 342.419', 'R$ 361.897'], 'Days of Inventory - Warehouse EoP': [0, 52, 0, 0, 35, 34, 21, 40], 'Days of Inventory - Total EoP': [78, 952, 476, 236, 210, 162, 153, 139], }},
                 'ND161200': { model: 'ESD', name: 'SWITCH DA EMBREAGEM MELHORADO - ESD', metrics: { 'Purchase Qty': [0, 2694, 890, 1019, 1249, 3791, 2415, 2143], 'Purchase cost - BRL': ['0', '72,660', '24,012', '27,486', '33,697', '102,236', '65,135', '57,793'], 'Warehouse inventory EoP - BRL': ['0', '0', '0', '0', '57,429', '54,524', '45,493', '28,621'], 'Stock Consumption - BRL': ['0', '0', '0', '0', '15,231', '26,916', '36,517', '50,569'], 'Total Inventory EoP - BRL': ['0', '72,660', '96,672', '124,158', '142,623', '217,943', '246,560', '253,784'], 'Days of Inventory - Warehouse EoP': [0, 0, 0, 0, 66, 43, 31, 17], 'Days of Inventory - Total EoP': [0, 0, 571, 265, 163, 172, 170, 151], }},
                 'M71009207D': { model: 'ESD', name: 'TUBO EXTERNO ESQUERDO ES (CANELA)', metrics: { 'Purchase Qty': [0, 520, 167, 203, 234, 719, 464, 401], 'Purchase cost - BRL': ['R$ 0', 'R$ 62.886', 'R$ 20.164', 'R$ 24.541', 'R$ 28.249', 'R$ 86.844', 'R$ 56.097', 'R$ 48.470'], 'Warehouse inventory EoP - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 50.108', 'R$ 47.676', 'R$ 41.648', 'R$ 27.485'], 'Stock Consumption - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 12.778', 'R$ 22.585', 'R$ 30.570', 'R$ 42.411'], 'Total Inventory EoP - BRL': ['R$ 0', 'R$ 62.886', 'R$ 83.049', 'R$ 107.590', 'R$ 123.062', 'R$ 187.311', 'R$ 212.838', 'R$ 218.897'], 'Days of Inventory - Warehouse EoP': [0, 0, 0, 0, 68, 45, 34, 19], 'Days of Inventory - Total EoP': [0, 0, 585, 274, 168, 176, 175, 155], }},
                 'N93205607D': { model: 'ESD', name: 'TUBO EXTERNO DIREITO ES (CANELA)', metrics: { 'Purchase Qty': [0, 436, 140, 170, 196, 602, 389, 336], 'Purchase cost - BRL': ['R$ 0', 'R$ 52.665', 'R$ 16.878', 'R$ 20.566', 'R$ 23.678', 'R$ 72.777', 'R$ 46.989', 'R$ 40.599'], 'Warehouse inventory EoP - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 41.972', 'R$ 39.980', 'R$ 34.830', 'R$ 22.984'], 'Stock Consumption - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 10.693', 'R$ 18.970', 'R$ 25.616', 'R$ 35.524'], 'Total Inventory EoP - BRL': ['R$ 0', 'R$ 52.665', 'R$ 69.544', 'R$ 90.110', 'R$ 103.095', 'R$ 156.901', 'R$ 178.274', 'R$ 183.348'], 'Days of Inventory - Warehouse EoP': [0, 0, 0, 0, 68, 45, 34, 19], 'Days of Inventory - Total EoP': [0, 0, 585, 273, 168, 176, 175, 155], }},
@@ -401,14 +404,13 @@ packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
                 const sections = {
                     logistics: document.getElementById('section-logistics'),
                     commercial: document.getElementById('section-commercial'),
-                    sop: document.getElementById('section-sop'),
+                    // S&OP is now part of 'additional'
                     additional: document.getElementById('section-additional'),
                 };
 
                 const navButtons = {
                     logistics: document.getElementById('nav-logistics'),
                     commercial: document.getElementById('nav-commercial'),
-                    sop: document.getElementById('nav-sop'),
                     additional: document.getElementById('nav-additional'),
                 };
 
@@ -421,7 +423,6 @@ packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
 
                 navButtons.logistics.addEventListener('click', () => navigate('logistics'));
                 navButtons.commercial.addEventListener('click', () => navigate('commercial'));
-                navButtons.sop.addEventListener('click', () => navigate('sop'));
                 navButtons.additional.addEventListener('click', () => navigate('additional'));
                 
                 // Container Loadability View Toggle
@@ -519,6 +520,16 @@ packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
                     setContainerView('chart');
                 }
                 
+                const toggleSopBtn = document.getElementById('toggle-sop-btn');
+                const sopSection = document.getElementById('section-sop');
+                toggleSopBtn.addEventListener('click', () => {
+                    sopSection.classList.toggle('hidden');
+                     if (!sopSection.classList.contains('hidden')) {
+                        sopSection.scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+
+
                 function updateSopView(skuId) {
                     const sopTitle = document.getElementById('sop-title');
                     const sopChartCanvas = document.getElementById('sopChart');
