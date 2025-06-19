@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mottu & TVS - Partnership Review</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Mottu Brand (Black, Green, Yellow) & TVS Blue -->
+    <!-- Application Structure Plan: A single-page application with tab-based navigation to separate key discussion topics: Logistics, Commercial, S&OP Forecast, and Additional Topics. This structure was chosen to allow presenters to focus on one area at a time during the meeting, preventing information overload. The S&OP section features an interactive master-detail interface: users select a SKU from a list, and the page dynamically updates a chart and a detailed data table. This interactivity is crucial for drilling down into specific product forecasts, directly addressing the user's need for an item-by-item analysis which a static document cannot provide. The user flow is from high-level operational issues to specific, data-driven planning. -->
+    <!-- Visualization & Content Choices: 
+        - Logistics/Container Load: Report Info (Container fulfillment table) -> Goal (Highlight inefficiency) -> Viz (Bar Chart & HTML Table) -> Interaction (Toggle between chart and an expanding table view) -> Justification (A bar chart shows impact, while the table provides details for discussion. The toggle expands the table view to full-width for better readability, preventing horizontal scroll.) -> Library (Chart.js).
+        - Logistics/Packaging Issues: Report Info (Photos and descriptions) -> Goal (Show physical evidence of problems) -> Presentation (Cards with buttons to launch an image modal) -> Justification (Keeps the main interface clean. A modal allows focused viewing of visual evidence without leaving the page context).
+        - Commercial: Report Info (Claim details, payment terms) -> Goal (Clearly state pending items and proposals) -> Presentation (Styled cards/tables) -> Justification (Organized and easy-to-read format for financial/claim topics).
+        - S&OP Forecast: Report Info (Multiple tables with monthly SKU data) -> Goal (Analyze and discuss future demand/supply for each key item) -> Viz (Combined Bar/Line Chart + HTML Table) -> Interaction (Model filters + SKU selection buttons update both chart and table) -> Justification (Filtering by model streamlines the discussion. The combined chart visualizes the relationship between planned purchases and inventory levels. The dynamic table provides all necessary details.) -> Library (Chart.js).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        :root {
+            --mottu-black: #000000;
+            --mottu-green: #4FAE45;
+            --mottu-yellow: #FFC700;
+            --tvs-blue: #0033A0;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: var(--mottu-green);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .sku-button.active, .model-filter-button.active {
+            background-color: var(--mottu-yellow);
+            color: var(--mottu-black);
+            font-weight: 600;
+        }
+        .view-toggle-button, .model-filter-button {
+            transition: background-color 0.2s ease-in-out;
+            border: 1px solid #cbd5e1;
+        }
+        .view-toggle-button.active {
+            background-color: #e2e8f0; /* slate-200 */
+            border-color: #94a3b8; /* slate-400 */
+            font-weight: 600;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 45vh;
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 300px;
+            }
+        }
+        .table-cell {
+            padding: 8px 12px;
+            border-bottom: 1px solid #e2e8f0; /* slate-200 */
+            white-space: nowrap;
+        }
+        .table-cell-left {
+             text-align: left;
+             font-weight: 500;
+        }
+        .table-cell-center {
+            text-align: center;
+        }
+        .table-header {
+            padding: 8px 12px;
+            font-weight: 600;
+            background-color: #f1f5f9; /* slate-100 */
+            border-bottom: 2px solid #cbd5e1; /* slate-300 */
+            white-space: nowrap;
+        }
+         .table-header-center {
+            text-align: center;
+        }
+         .table-header-left {
+            text-align: left;
+        }
+        .kpi-card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            border-left: 4px solid var(--mottu-green);
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <header class="text-center mb-12">
+            <div class="flex justify-center items-center gap-6 md:gap-10">
+                 <div>
+                    <h1 class="text-4xl font-bold text-black"><span style="color: var(--mottu-green);">Mottu</span> & <span style="color: var(--tvs-blue);">TVS</span></h1>
+                    <p class="text-xl text-slate-600 mt-2">Partnership Review & Action Plan - June 19, 2025</p>
+                </div>
+                <img src="https://www.tvsmotor.com/images/tvs-logo.png" alt="TVS Logo" class="h-12 md:h-14" onerror="this.onerror=null;this.src='https://placehold.co/200x80/FFFFFF/000000?text=TVS';">
+            </div>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 mb-8">
+            <button id="nav-logistics" class="nav-button px-4 py-2 rounded-lg font-semibold bg-white shadow-sm hover:bg-green-100">Logistics & Operations</button>
+            <button id="nav-commercial" class="nav-button px-4 py-2 rounded-lg font-semibold bg-white shadow-sm hover:bg-green-100">Commercial & Claims</button>
+            <button id="nav-sop" class="nav-button px-4 py-2 rounded-lg font-semibold bg-white shadow-sm hover:bg-green-100">S&OP Forecast</button>
+            <button id="nav-additional" class="nav-button px-4 py-2 rounded-lg font-semibold bg-white shadow-sm hover:bg-green-100">Additional Topics</button>
+        </nav>
+
+        <main>
+            <!-- Logistics Section -->
+            <section id="section-logistics" class="space-y-8">
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-black">Logistics & Operations Review</h2>
+                     <p class="mt-2 text-slate-600 max-w-3xl mx-auto">This section outlines key operational challenges we've faced that require joint review for process improvement, focusing on packaging, product integrity, and container space optimization.</p>
+                </div>
+
+                <div id="logistics-grid" class="grid md:grid-cols-2 gap-8 items-start">
+                    <div id="packaging-card" class="bg-white p-6 rounded-lg shadow-md">
+                        <h3 class="text-xl font-semibold mb-3 text-black">Packaging & Loading Issues</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <h4 class="font-semibold text-slate-700">A. Master Box not completely filled</h4>
+                                <p class="text-slate-600 mt-1 text-sm">We need to explore options to improve master box space optimization. <br> (Order 5197028)</p>
+                                <button class="mt-2 px-3 py-1 bg-slate-200 text-slate-800 text-sm font-semibold rounded-md hover:bg-slate-300" onclick="showImageModal('A')">View Images</button>
+                            </div>
+                            <div class="border-t pt-4">
+                                <h4 class="font-semibold text-slate-700">B. Packaging Damage on Arrival</h4>
+                                <p class="text-slate-600 mt-1 text-sm">The current loading process may be causing damage to packages. <br> (MOT 192/24 - Inv: 92006883-92006887-92006888)</p>
+                                <button class="mt-2 px-3 py-1 bg-slate-200 text-slate-800 text-sm font-semibold rounded-md hover:bg-slate-300" onclick="showImageModal('B')">View Images</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="container-card" class="bg-white p-6 rounded-lg shadow-md">
+                        <div class="flex justify-between items-center mb-4">
+                             <h3 class="text-xl font-semibold text-black">Container Load Factor Analysis</h3>
+                             <div class="flex rounded-md shadow-sm">
+                                <button id="view-chart-btn" class="view-toggle-button px-3 py-1 text-sm rounded-l-md">Chart</button>
+                                <button id="view-table-btn" class="view-toggle-button px-3 py-1 text-sm rounded-r-md">Table</button>
+                             </div>
+                        </div>
+                        <p class="text-slate-600 mb-4">Some examples of last containers received with low use of available space in the container.</p>
+                        
+                        <div id="container-chart-view" class="chart-container">
+                            <canvas id="containerChart"></canvas>
+                        </div>
+
+                        <div id="container-table-view" class="overflow-x-auto hidden">
+                             <table class="w-full border-collapse text-sm">
+                                <thead id="container-table-head"></thead>
+                                <tbody id="container-table-body"></tbody>
+                             </table>
+                        </div>
+
+                        <p class="mt-6 text-center text-sm font-semibold text-slate-700 bg-yellow-100 p-3 rounded-md">
+                            Action Point: Understand how to improve it from the order placement till the container loading at the factory.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Commercial Section -->
+            <section id="section-commercial" class="hidden space-y-8">
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-black">Commercial & Financials</h2>
+                     <p class="mt-2 text-slate-600 max-w-3xl mx-auto">Here we address pending commercial topics, including an open transit claim and a proposal to reinforce our payment process to ensure smoother operations.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="kpi-card">
+                        <h3 class="text-xl font-semibold mb-3 text-black">Open Transit Claim</h3>
+                        <p class="text-slate-600">We require an update on the investigation and reimbursement for the following claim:</p>
+                        <div class="mt-4 bg-green-50 p-4 rounded-lg">
+                            <p><strong>Material:</strong> Rotor Assy</p>
+                            <p><strong>Issue:</strong> Requested NA320030, received N3060340.</p>
+                            <p><strong>Date:</strong> May 23rd</p>
+                            <p class="font-bold text-xl mt-2 text-black">Amount: $ 24,998.00</p>
+                        </div>
+                    </div>
+                    <div class="kpi-card">
+                        <h3 class="text-xl font-semibold mb-3 text-black">Payment Process Reinforcement</h3>
+                        <p class="text-slate-600">To avoid cargo dispatch delays, we propose to strictly follow these agreed-upon terms:</p>
+                        <ul class="mt-4 space-y-2 list-disc list-inside text-slate-700">
+                            <li>Orders placed by the <strong>20th</strong> of the current month.</li>
+                            <li><strong>25% down payment</strong> after PI is received.</li>
+                            <li><strong>75% remaining payment</strong> by the 5th of the next month.</li>
+                            <li>Shipment concluded within the next month.</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- S&OP Section -->
+            <section id="section-sop" class="hidden space-y-6">
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-black">Top SKUs - S&OP Forecast (May - Dec 2025)</h2>
+                     <p class="mt-2 text-slate-600 max-w-4xl mx-auto">This section provides a detailed supply and demand forecast for our key SKUs. Please select a product to view its specific plan.</p>
+                </div>
+
+                <div id="model-filter-selector" class="flex flex-wrap justify-center gap-2 mb-4">
+                     <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="All">All Models</button>
+                     <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="KS">Mottu Sport KS</button>
+                     <button class="model-filter-button px-3 py-1.5 rounded-md bg-white shadow-sm" data-model="ESD">Mottu Sport ESD</button>
+                </div>
+                
+                <div id="sku-selector" class="flex flex-wrap justify-center gap-2 p-2 bg-slate-100 rounded-lg">
+                    <!-- SKU buttons will be injected here -->
+                </div>
+
+                <div class="bg-white p-4 sm:p-6 rounded-lg shadow-lg mt-4">
+                    <h3 id="sop-title" class="text-2xl font-bold text-center mb-4 text-black"></h3>
+                    <div class="chart-container mb-6">
+                        <canvas id="sopChart"></canvas>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border-collapse">
+                            <thead id="sop-table-head"></thead>
+                            <tbody id="sop-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+                 <div class="text-center mt-4">
+                    <p class="text-sm text-slate-500 italic"><strong>Disclaimer:</strong> The data presented is part of a planning exercise. The values are estimates based on our current forecast and should not be considered a firm commitment or an absolute purchase guarantee. They are intended for discussion and planning purposes only.</p>
+                </div>
+            </section>
+
+            <!-- Additional Topics Section -->
+            <section id="section-additional" class="hidden space-y-8">
+                <div class="text-center">
+                     <h2 class="text-3xl font-bold text-black">Additional Topics for Discussion</h2>
+                     <p class="mt-2 text-slate-600 max-w-3xl mx-auto">The following topics are also on our agenda. We will provide detailed documentation for these points in our next weekly meeting.</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="kpi-card">
+                        <h3 class="text-xl font-semibold mb-3 text-black">Wrong Purchase by Wrong Item Code</h3>
+                        <p class="text-slate-600">We need to discuss recurring issues of incorrect parts being ordered due to item code mismatches and explore potential automatic validation systems.</p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3 class="text-xl font-semibold mb-3 text-black">Order Fulfillment & Credit Policy</h3>
+                        <p class="text-slate-600">Discussion on order fulfillment rates and establishing a clear credit policy for failures or discrepancies in shipments.</p>
+                    </div>
+                     <div class="kpi-card">
+                        <h3 class="text-xl font-semibold mb-3 text-black">Purchase History and Centralized Access</h3>
+                        <p class="text-slate-600">Proposal to develop a centralized platform for accessing complete purchase histories to improve tracking and analysis.</p>
+                    </div>
+                    <div class="kpi-card">
+                        <h3 class="text-xl font-semibold mb-3 text-black">Purchase and Freight Integration</h3>
+                        <p class="text-slate-600">Exploring options for better integration between the purchase order system and freight management to optimize logistics and costs.</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Image Modal -->
+    <div id="image-modal" class="fixed inset-0 bg-black bg-opacity-75 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-lg p-6 w-full max-w-4xl max-h-full overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="modal-title" class="text-2xl font-bold text-black"></h3>
+                <button id="close-modal-btn" class="text-3xl font-light text-slate-600 hover:text-black">&times;</button>
+            </div>
+            <div id="modal-image-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- Images will be injected here -->
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const appData = {
+            containerData: [
+                { ref: 'MOT039/25', type: "40'hc", grossWeight: '4.695', cbm: '40', weightCap: '28000', cbmCap: '76', weightPct: 17, cbmPct: 53 },
+                { ref: 'MOT038/25', type: "40'hc", grossWeight: '7.984', cbm: '40', weightCap: '28000', cbmCap: '76', weightPct: 29, cbmPct: 53 },
+                { ref: 'MOT037/25', type: "40'hc", grossWeight: '6.575', cbm: '40', weightCap: '28000', cbmCap: '76', weightPct: 23, cbmPct: 53 },
+                { ref: 'MOT036/25', type: "40'hc", grossWeight: '5.539', cbm: '40', weightCap: '28000', cbmCap: '76', weightPct: 20, cbmPct: 53 },
+                { ref: 'MOT030/25', type: "40'hc", grossWeight: '7.440', cbm: '40', weightCap: '28000', cbmCap: '76', weightPct: 27, cbmPct: 53 },
+                { ref: 'MOT032/25', type: "40'hc", grossWeight: '11.312', cbm: '40', weightCap: '28000', cbmCap: '76', weightPct: 40, cbmPct: 53 },
+                { ref: 'MOT031/25', type: "40'hc", grossWeight: '10.253', cbm: '40', weightCap: '28000', cbmCap: '76', weightPct: 37, cbmPct: 53 },
+                { ref: 'MOT033/25', type: "40'hc", grossWeight: '16.142', cbm: '60', weightCap: '28000', cbmCap: '76', weightPct: 58, cbmPct: 79 },
+                { ref: 'MOT018/25', type: "40'hc", grossWeight: '13.529', cbm: '40', weightCap: '28000', cbmCap: '76', weightPct: 48, cbmPct: 53 },
+            ],
+            packagingImages: {
+                A: {
+                    title: 'Master Box Not Completely Filled',
+                    urls: [
+                        'https://placehold.co/600x400/e2e8f0/94a3b8?text=Image+1:+Unfilled+Master+Box',
+                        'https://placehold.co/600x400/e2e8f0/94a3b8?text=Image+2:+Empty+Space+View'
+                    ]
+                },
+                B: {
+                    title: 'Packaging Damage on Arrival',
+                    urls: [
+                        'https://placehold.co/600x400/e2e8f0/94a3b8?text=Image+1:+Damaged+Box',
+                        'https://placehold.co/600x400/e2e8f0/94a3b8?text=Image+2:+Loaded+Container+View'
+                    ]
+                }
+            },
+            sopData: {
+                'N8112240': { model: 'KS', name: 'PNEU TRASEIRO - Mottu Sport', metrics: {'Purchase Qty': [13880, 0, 0, 0, 6699, 7116, 6576, 0], 'Purchase cost - BRL': ['1,353,300', '0', '0', '0', '653,175', '693,776', '641,204', '0'], 'Warehouse inventory EoP - BRL': ['1,784,738', '2,089,480', '2,101,506', '2,361,346', '1,640,990', '1,068,210', '1,159,453', '667,061'], 'Stock Consumption - BRL': ['772,785', '121,040', '578,824', '502,610', '720,356', '572,780', '561,932', '492,392'], 'Total Inventory EoP - BRL': ['3,563,820', '3,442,780', '2,863,956', '2,361,346', '2,294,165', '2,415,161', '2,494,433', '2,002,040'], 'Days of Inventory - Warehouse EoP': [109, 156, 105, 118, 80, 59, 66, 41], 'Days of Inventory - Total EoP': [218, 258, 143, 118, 111, 134, 142, 122], }},
+                'N8112230': { model: 'KS', name: 'PNEU DIANTEIRO - Mottu Sport', metrics: { 'Purchase Qty': [3540, 5024, 4800, 0, 0, 4800, 0, 4800], 'Purchase cost - BRL': ['327,450', '464,695', '444,000', '0', '0', '444,000', '0', '444,000'], 'Warehouse inventory EoP - BRL': ['1,145,243', '365,796', '147,668', '273,539', '471,753', '705,376', '499,978', '320,894'], 'Stock Consumption - BRL': ['124,413', '788,789', '218,128', '201,579', '266,461', '210,377', '205,398', '179,084'], 'Total Inventory EoP - BRL': ['1,472,693', '1,148,598', '1,374,471', '1,172,892', '906,411', '1,140,033', '934,635', '1,199,552'], 'Days of Inventory - Warehouse EoP': [91, 27, 19, 36, 62, 107, 78, 54], 'Days of Inventory - Total EoP': [117, 86, 180, 156, 120, 172, 146, 201], }},
+                'ND320750': { model: 'KS', name: 'KIT CILINDRO USHA - Mottu Sport', metrics: { 'Purchase Qty': [4080, 0, 2212, 2213, 0, 2446, 2251, 0], 'Purchase cost - BRL': ['616,774', '0', '334,375', '334,480', '0', '369,781', '340,253', '0'], 'Warehouse inventory EoP - BRL': ['490,547', '407,176', '279,891', '656,002', '348,560', '430,331', '506,764', '268,943'], 'Stock Consumption - BRL': ['320,783', '257,669', '236,581', '240,663', '307,442', '252,605', '258,047', '237,821'], 'Total Inventory EoP - BRL': ['1,371,414', '1,113,745', '1,211,539', '1,305,357', '997,915', '1,115,091', '1,197,297', '959,476'], 'Days of Inventory - Warehouse EoP': [54, 50, 32, 74, 38, 52, 61, 34], 'Days of Inventory - Total EoP': [151, 136, 139, 147, 110, 134, 145, 121], }},
+                'N3200090': { model: 'KS', name: 'ROLAMENTO ESFERA CILIND 20X42X12', metrics: { 'Purchase Qty': [8004, 0, 4645, 5187, 4913, 0, 4539, 4269], 'Purchase cost - BRL': ['150,955', '0', '87,598', '97,834', '92,665', '0', '85,608', '80,505'], 'Warehouse inventory EoP - BRL': ['246,953', '194,484', '124,212', '203,763', '112,599', '125,342', '146,698', '168,922'], 'Stock Consumption - BRL': ['217,644', '60,126', '70,272', '71,404', '91,165', '74,855', '76,477', '70,442'], 'Total Inventory EoP - BRL': ['397,908', '337,783', '355,108', '381,538', '383,039', '308,184', '317,314', '327,377'], 'Days of Inventory - Warehouse EoP': [-255, 87, 48, 77, 42, 51, 60, 72], 'Days of Inventory - Total EoP': [-410, 151, 137, 145, 142, 125, 130, 139], }},
+                'KA060100': { model: 'KS', name: 'BICO INJETOR - POP / Sport', metrics: { 'Purchase Qty': [0, 0, 0, 0, 0, 2142, 1945, 1909], 'Purchase cost - BRL': ['0', '0', '0', '0', '0', '152,727', '138,714', '136,147'], 'Warehouse inventory EoP - BRL': ['577,611', '506,800', '710,034', '606,919', '470,896', '356,158', '236,286', '124,165'], 'Stock Consumption - BRL': ['122,011', '77,015', '-70,312', '103,114', '136,024', '114,738', '119,872', '112,121'], 'Total Inventory EoP - BRL': ['716,737', '639,722', '710,034', '606,919', '470,896', '508,884', '527,726', '551,752'], 'Days of Inventory - Warehouse EoP': [404, 415, 379, 154, 114, 92, 61, 33], 'Days of Inventory - Total EoP': [501, 524, 379, 154, 114, 132, 136, 148], }},
+                'NA020140': { model: 'KS', name: 'VIRABREQUIM DO MOTOR', metrics: { 'Purchase Qty': [0, 0, 0, 0, 0, 714, 742, 726], 'Purchase cost - BRL': ['0', '0', '0', '0', '0', '128,020', '133,057', '130,095'], 'Warehouse inventory EoP - BRL': ['195,448', '186,393', '749,605', '638,433', '496,554', '379,644', '260,044', '149,661'], 'Stock Consumption - BRL': ['130,896', '96,917', '-61,145', '111,172', '141,879', '116,910', '119,600', '110,383'], 'Total Inventory EoP - BRL': ['785,378', '688,461', '749,605', '638,433', '496,554', '507,664', '521,121', '540,833'], 'Days of Inventory - Warehouse EoP': [106, 114, 352, 155, 118, 98, 68, 41], 'Days of Inventory - Total EoP': [424, 422, 352, 155, 118, 132, 136, 147], }},
+                'ND161010': { model: 'ESD', name: 'CHICOTE PRINCIPAL COMPLETO - ESD', metrics: { 'Purchase Qty': [8004, 0, 4645, 5187, 4913, 0, 4539, 4269], 'Purchase cost - BRL': ['150,955', '0', '87,598', '97,834', '92,665', '0', '85,608', '80,505'], 'Warehouse inventory EoP - BRL': ['246,953', '194,484', '124,212', '203,763', '112,599', '125,342', '146,698', '168,922'], 'Stock Consumption - BRL': ['217,644', '60,126', '70,272', '71,404', '91,165', '74,855', '76,477', '70,442'], 'Total Inventory EoP - BRL': ['397,908', '337,783', '355,108', '381,538', '383,039', '308,184', '317,314', '327,377'], 'Days of Inventory - Warehouse EoP': [-255, 87, 48, 77, 42, 51, 60, 72], 'Days of Inventory - Total EoP': [-410, 151, 137, 145, 142, 125, 130, 139], }},
+                'ND161200': { model: 'ESD', name: 'SWITCH DA EMBREAGEM MELHORADO - ESD', metrics: { 'Purchase Qty': [0, 2694, 890, 1019, 1249, 3791, 2415, 2143], 'Purchase cost - BRL': ['0', '72,660', '24,012', '27,486', '33,697', '102,236', '65,135', '57,793'], 'Warehouse inventory EoP - BRL': ['0', '0', '0', '0', '57,429', '54,524', '45,493', '28,621'], 'Stock Consumption - BRL': ['0', '0', '0', '0', '15,231', '26,916', '36,517', '50,569'], 'Total Inventory EoP - BRL': ['0', '72,660', '96,672', '124,158', '142,623', '217,943', '246,560', '253,784'], 'Days of Inventory - Warehouse EoP': [0, 0, 0, 0, 66, 43, 31, 17], 'Days of Inventory - Total EoP': [0, 0, 571, 265, 163, 172, 170, 151], }},
+                'M71009207D': { model: 'ESD', name: 'TUBO EXTERNO ESQUERDO ES (CANELA)', metrics: { 'Purchase Qty': [0, 520, 167, 203, 234, 719, 464, 401], 'Purchase cost - BRL': ['R$ 0', 'R$ 62.886', 'R$ 20.164', 'R$ 24.541', 'R$ 28.249', 'R$ 86.844', 'R$ 56.097', 'R$ 48.470'], 'Warehouse inventory EoP - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 50.108', 'R$ 47.676', 'R$ 41.648', 'R$ 27.485'], 'Stock Consumption - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 12.778', 'R$ 22.585', 'R$ 30.570', 'R$ 42.411'], 'Total Inventory EoP - BRL': ['R$ 0', 'R$ 62.886', 'R$ 83.049', 'R$ 107.590', 'R$ 123.062', 'R$ 187.311', 'R$ 212.838', 'R$ 218.897'], 'Days of Inventory - Warehouse EoP': [0, 0, 0, 0, 68, 45, 34, 19], 'Days of Inventory - Total EoP': [0, 0, 585, 274, 168, 176, 175, 155], }},
+                'N93205607D': { model: 'ESD', name: 'TUBO EXTERNO DIREITO ES (CANELA)', metrics: { 'Purchase Qty': [0, 436, 140, 170, 196, 602, 389, 336], 'Purchase cost - BRL': ['R$ 0', 'R$ 52.665', 'R$ 16.878', 'R$ 20.566', 'R$ 23.678', 'R$ 72.777', 'R$ 46.989', 'R$ 40.599'], 'Warehouse inventory EoP - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 41.972', 'R$ 39.980', 'R$ 34.830', 'R$ 22.984'], 'Stock Consumption - BRL': ['R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 10.693', 'R$ 18.970', 'R$ 25.616', 'R$ 35.524'], 'Total Inventory EoP - BRL': ['R$ 0', 'R$ 52.665', 'R$ 69.544', 'R$ 90.110', 'R$ 103.095', 'R$ 156.901', 'R$ 178.274', 'R$ 183.348'], 'Days of Inventory - Warehouse EoP': [0, 0, 0, 0, 68, 45, 34, 19], 'Days of Inventory - Total EoP': [0, 0, 585, 273, 168, 176, 175, 155], }},
+                'N3111860': { model: 'ESD', name: 'CONJUNTO DO CILINDRO MESTRE DIANTEIRO', metrics: { 'Purchase Qty': [150, 0, 0, 111, 370, 213, 235, 284], 'Purchase cost - BRL': ['R$ 25.662', 'R$ 0', 'R$ 0', 'R$ 18.974', 'R$ 63.381', 'R$ 36.493', 'R$ 40.132', 'R$ 48.605'], 'Warehouse inventory EoP - BRL': ['R$ 73.907', 'R$ 51.923', 'R$ 42.856', 'R$ 57.055', 'R$ 38.450', 'R$ 18.776', 'R$ 40.316', 'R$ 37.831'], 'Stock Consumption - BRL': ['R$ 2.224', 'R$ 23.010', 'R$ 9.067', 'R$ 11.462', 'R$ 18.605', 'R$ 19.674', 'R$ 26.517', 'R$ 36.782'], 'Total Inventory EoP - BRL': ['R$ 99.569', 'R$ 76.558', 'R$ 67.491', 'R$ 75.002', 'R$ 119.778', 'R$ 136.598', 'R$ 150.212', 'R$ 162.035'], 'Days of Inventory - Warehouse EoP': [194, 107, 99, 103, 53, 20, 38, 31], 'Days of Inventory - Total EoP': [261, 158, 155, 136, 166, 148, 142, 132], }},
+                'ND161189': { model: 'ESD', name: 'CHICOTE ELETRICO - Mottu Sport - ESD', metrics: { 'Purchase Qty': [407, 0, 0, 0, 0, 0, 0, 0], 'Purchase cost - BRL': ['R$ 107.953', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 0', 'R$ 0'], 'Warehouse inventory EoP - BRL': ['R$ 0', 'R$ 36.073', 'R$ 410.878', 'R$ 507.160', 'R$ 488.262', 'R$ 468.104', 'R$ 441.049', 'R$ 403.385'], 'Stock Consumption - BRL': ['R$ 30.990', 'R$ 19.628', 'R$ 9.283', '-R$ 72.411', 'R$ 18.898', 'R$ 20.158', 'R$ 27.054', 'R$ 37.664'], 'Total Inventory EoP - BRL': ['R$ 463.661', 'R$ 444.033', 'R$ 434.750', 'R$ 507.160', 'R$ 488.262', 'R$ 468.104', 'R$ 441.049', 'R$ 403.385'], 'Days of Inventory - Warehouse EoP': [0, -75, -836, -1368, 665, 496, 409, 321], 'Days of Inventory - Total EoP': [615, -919, -885, -1368, 665, 496, 409, 321], }},
+            },
+            sopChartInstance: null,
+            timeLabels: ['May-25', 'Jun-25', 'Jul-25', 'Aug-25', 'Sep-25', 'Oct-25', 'Nov-25', 'Dec-25']
+        };
+
+        const modal = document.getElementById('image-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalImageGrid = document.getElementById('modal-image-grid');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+
+        function showImageModal(issueType) {
+            const issueData = appData.packagingImages[issueType];
+            modalTitle.textContent = issueData.title;
+            modalImageGrid.innerHTML = issueData.urls.map(url => `
+                <div class="bg-slate-100 rounded-lg overflow-hidden">
+                    <img src="${url}" alt="Packaging issue image" class="w-full h-auto object-cover">
+                </div>
+            `).join('');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+        }
+
+        function hideImageModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+        }
+        
+        closeModalBtn.addEventListener('click', hideImageModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                hideImageModal();
+            }
+        });
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const sections = {
+                logistics: document.getElementById('section-logistics'),
+                commercial: document.getElementById('section-commercial'),
+                sop: document.getElementById('section-sop'),
+                additional: document.getElementById('section-additional'),
+            };
+
+            const navButtons = {
+                logistics: document.getElementById('nav-logistics'),
+                commercial: document.getElementById('nav-commercial'),
+                sop: document.getElementById('nav-sop'),
+                additional: document.getElementById('nav-additional'),
+            };
+
+            function navigate(section) {
+                Object.values(sections).forEach(s => s.classList.add('hidden'));
+                Object.values(navButtons).forEach(b => b.classList.remove('active'));
+                sections[section].classList.remove('hidden');
+                navButtons[section].classList.add('active');
+            }
+
+            navButtons.logistics.addEventListener('click', () => navigate('logistics'));
+            navButtons.commercial.addEventListener('click', () => navigate('commercial'));
+            navButtons.sop.addEventListener('click', () => navigate('sop'));
+            navButtons.additional.addEventListener('click', () => navigate('additional'));
+            
+            // Container Loadability View Toggle
+            const viewChartBtn = document.getElementById('view-chart-btn');
+            const viewTableBtn = document.getElementById('view-table-btn');
+            const chartView = document.getElementById('container-chart-view');
+            const tableView = document.getElementById('container-table-view');
+            const logisticsGrid = document.getElementById('logistics-grid');
+            const packagingCard = document.getElementById('packaging-card');
+            const containerCard = document.getElementById('container-card');
+
+
+            function setContainerView(view) {
+                if (view === 'chart') {
+                    chartView.classList.remove('hidden');
+                    tableView.classList.add('hidden');
+                    viewChartBtn.classList.add('active');
+                    viewTableBtn.classList.remove('active');
+                    
+                    packagingCard.classList.remove('hidden');
+                    logisticsGrid.classList.remove('md:grid-cols-1');
+                    logisticsGrid.classList.add('md:grid-cols-2');
+                    containerCard.classList.remove('md:col-span-2');
+
+                } else { // view === 'table'
+                    chartView.classList.add('hidden');
+                    tableView.classList.remove('hidden');
+                    viewChartBtn.classList.remove('active');
+                    viewTableBtn.classList.add('active');
+
+                    packagingCard.classList.add('hidden');
+                    logisticsGrid.classList.remove('md:grid-cols-2');
+                    logisticsGrid.classList.add('md:grid-cols-1');
+                    containerCard.classList.add('md:col-span-2');
+                }
+            }
+            viewChartBtn.addEventListener('click', () => setContainerView('chart'));
+            viewTableBtn.addEventListener('click', () => setContainerView('table'));
+
+
+            function initContainerSection() {
+                // Chart
+                const ctx = document.getElementById('containerChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: appData.containerData.map(d => d.ref),
+                        datasets: [
+                            {
+                                label: '% Fulfillment Weight',
+                                data: appData.containerData.map(d => d.weightPct),
+                                backgroundColor: 'rgba(79, 174, 69, 0.7)', // Mottu Green
+                                borderColor: 'rgba(79, 174, 69, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: '% Fulfillment CBM',
+                                data: appData.containerData.map(d => d.cbmPct),
+                                backgroundColor: 'rgba(255, 199, 0, 0.7)', // Mottu Yellow
+                                borderColor: 'rgba(255, 199, 0, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, max: 100, title: { display: true, text: 'Fulfillment %' }, ticks: { callback: value => value + '%' } } },
+                        plugins: {
+                            title: { display: false },
+                            tooltip: { callbacks: { label: context => `${context.dataset.label}: ${context.parsed.y}%` } }
+                        }
+                    }
+                });
+
+                // Table
+                const tableHead = document.getElementById('container-table-head');
+                const tableBody = document.getElementById('container-table-body');
+                const headers = ['Our Ref', 'Container Type', 'Gross Weight Declared B/L', 'CBM Declared B/L', 'Container Capacity (Weight)', 'Container Capacity (CBM)', '% Fulfillment Weight', '% Fulfillment CBM'];
+                tableHead.innerHTML = `<tr>${headers.map((h, i) => `<th class="table-header ${i===0 ? 'table-header-left' : 'table-header-center'}">${h}</th>`).join('')}</tr>`;
+                
+                tableBody.innerHTML = appData.containerData.map(row => `
+                    <tr>
+                        <td class="table-cell table-cell-left">${row.ref}</td>
+                        <td class="table-cell table-cell-center">${row.type}</td>
+                        <td class="table-cell table-cell-center">${row.grossWeight}</td>
+                        <td class="table-cell table-cell-center">${row.cbm}</td>
+                        <td class="table-cell table-cell-center">${row.weightCap}</td>
+                        <td class="table-cell table-cell-center">${row.cbmCap}</td>
+                        <td class="table-cell table-cell-center font-bold text-green-600">${row.weightPct}%</td>
+                        <td class="table-cell table-cell-center font-bold text-yellow-600">${row.cbmPct}%</td>
+                    </tr>
+                `).join('');
+                
+                setContainerView('chart');
+            }
+            
+            function updateSopView(skuId) {
+                const sopTitle = document.getElementById('sop-title');
+                const sopChartCanvas = document.getElementById('sopChart');
+                const tableHead = document.getElementById('sop-table-head');
+                const tableBody = document.getElementById('sop-table-body');
+
+                if (appData.sopChartInstance) {
+                    appData.sopChartInstance.destroy();
+                }
+
+                if (!skuId) {
+                    sopTitle.textContent = "Please select a model and SKU";
+                    sopChartCanvas.style.display = 'none';
+                    tableHead.innerHTML = '';
+                    tableBody.innerHTML = '';
+                    return;
+                }
+
+                sopChartCanvas.style.display = 'block';
+
+                const skuData = appData.sopData[skuId];
+                if (!skuData) return;
+
+                sopTitle.textContent = `${skuData.name} (${skuId})`;
+
+                const ctx = sopChartCanvas.getContext('2d');
+                appData.sopChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: appData.timeLabels,
+                        datasets: [
+                            {
+                                label: 'Purchase Qty',
+                                data: skuData.metrics['Purchase Qty'],
+                                backgroundColor: 'rgba(79, 174, 69, 0.6)', // Mottu Green
+                                borderColor: 'rgba(79, 174, 69, 1)',
+                                borderWidth: 1,
+                                yAxisID: 'y'
+                            },
+                             {
+                                label: 'Days of Inventory - Total EoP',
+                                data: skuData.metrics['Days of Inventory - Total EoP'],
+                                type: 'line',
+                                borderColor: 'rgba(255, 199, 0, 1)', // Mottu Yellow
+                                backgroundColor: 'rgba(255, 199, 0, 0.2)',
+                                tension: 0.2,
+                                yAxisID: 'y1',
+                                fill: true,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            y: { type: 'linear', display: true, position: 'left', title: { display: true, text: 'Quantity (Units)', color: '#000000' } },
+                            y1: { type: 'linear', display: true, position: 'right', title: { display: true, text: 'Days of Inventory', color: '#000000' }, grid: { drawOnChartArea: false } }
+                        },
+                        plugins: {
+                           title: { display: false },
+                           tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) { label += ': '; }
+                                        if (context.parsed.y !== null) {
+                                            label += context.parsed.y.toLocaleString('en-US');
+                                            if (context.dataset.yAxisID === 'y') {
+                                                label += ' units';
+                                            } else {
+                                                label += ' days';
+                                            }
+                                        }
+                                        return label;
+                                    }
+                                }
+                           }
+                        }
+                    }
+                });
+                
+                tableHead.innerHTML = `<tr><th class="table-header table-header-left">Metric</th>${appData.timeLabels.map(l => `<th class="table-header table-header-center">${l}</th>`).join('')}</tr>`;
+                
+                tableBody.innerHTML = Object.entries(skuData.metrics).map(([metricName, values]) => {
+                    const isBold = metricName.includes('EoP') || metricName.includes('Purchase Qty');
+                    const rowClass = isBold ? 'font-bold text-black' : '';
+                    if (metricName === 'model') return '';
+                    return `<tr class="${rowClass}">
+                                <td class="table-cell table-cell-left">${metricName}</td>
+                                ${values.map(v => `<td class="table-cell table-cell-center">${typeof v === 'number' ? v.toLocaleString('en-US') : v}</td>`).join('')}
+                           </tr>`;
+                }).join('');
+
+                document.querySelectorAll('.sku-button').forEach(btn => btn.classList.remove('active'));
+                const activeSkuBtn = document.querySelector(`.sku-button[data-sku="${skuId}"]`);
+                if(activeSkuBtn) activeSkuBtn.classList.add('active');
+            }
+
+            function populateSkuButtons(modelFilter = 'All') {
+                const selector = document.getElementById('sku-selector');
+                const skuIds = Object.keys(appData.sopData);
+
+                const filteredSkuIds = skuIds.filter(id => {
+                    if (modelFilter === 'All') return true;
+                    return appData.sopData[id].model === modelFilter;
+                });
+
+                selector.innerHTML = filteredSkuIds.map(id => `<button class="sku-button text-sm px-3 py-1.5 rounded-md bg-white shadow-sm hover:bg-yellow-100" data-sku="${id}">${appData.sopData[id].name}</button>`).join('');
+                
+                document.querySelectorAll('.sku-button').forEach(button => {
+                    button.addEventListener('click', () => {
+                        updateSopView(button.dataset.sku);
+                    });
+                });
+                
+                if (filteredSkuIds.length > 0) {
+                    updateSopView(filteredSkuIds[0]);
+                } else {
+                    updateSopView(null);
+                }
+            }
+            
+            document.querySelectorAll('.model-filter-button').forEach(button => {
+                button.addEventListener('click', () => {
+                     document.querySelectorAll('.model-filter-button').forEach(btn => btn.classList.remove('active'));
+                     button.classList.add('active');
+                     populateSkuButtons(button.dataset.model);
+                });
+            });
+
+            initContainerSection();
+            document.querySelector('.model-filter-button[data-model="All"]').classList.add('active');
+            populateSkuButtons('All');
+            navigate('logistics');
+        });
+
+    </script>
+</body>
+</html>
